@@ -7,7 +7,7 @@
 #skill is a value from -inf to inf, which is plugged into a logit equation
 #along with opponent to determine result
 
-#aggression is a value from 0.1 0.9 where it is used as a proportional 
+#aggression is a value from 0.5 0.9 where it is used as a proportional 
 #selection criteria for next encounters
 
 #more aggressive players are probably better, so adding in relationship between the two
@@ -17,24 +17,29 @@
 
 #bots<-players<-data.frame(id=1:50,skill=rep(-3,50),aggression=rep(0.5,50),
  #                         alive=rep(1,100),kills=rep(0,100))
+source("battle royale functions.R")
 
 results<-c()
 
 #create player pool
 player_number<-100000
 all_players<-data.frame(id=1:player_number,skill=rnorm(player_number),
-                    aggression=runif(player_number,min=0.1,max=0.9),
+                    aggression=runif(player_number,min=0.5,max=1),
                     matches_played=rep(0,player_number),
                     matches_won=rep(0,player_number),
                     kills=rep(0,player_number),
                     deaths=rep(0,player_number))
 all_players$skill<-2*(all_players$aggression-0.5)+0.5*rnorm(player_number)
 
+all_players$platform<-c(rep("PC",length(all_players[,1])/2),
+                        rep("Console",length(all_players[,1])/2))
+
+all_players$skill[all_players$platform=="PC"]<-all_players$skill[all_players$platform=="PC"]+1
 
 #run through all players a few times so there are statistics
 
-#everyone plays 10 matches to initialise the numbers
-for(l in 1:100){
+#everyone plays 100 matches to initialise the numbers
+for(l in 1:10){
   print(l)
 for(k in 1:1000){
   #if(k%%100==0){print(k)}
@@ -55,9 +60,9 @@ r$matches_played<-r$matches_played+1
 s<-which(all_players$id==r$id)
 
 
-all_players[s,]<-r[,1:7]
+all_players[s,]<-r[,1:8]
 }}
-save(all_players,file="all_players.RData")
+save(all_players,file="all_players_platform.RData")
 
 
 
