@@ -31,15 +31,17 @@ all_players<-data.frame(id=1:player_number,skill=rnorm(player_number),
                     deaths=rep(0,player_number))
 all_players$skill<-2*(all_players$aggression-0.5)+0.5*rnorm(player_number)
 
-all_players$platform<-c(rep("PC",length(all_players[,1])/2),
-                        rep("Console",length(all_players[,1])/2))
+s<-sample(1:length(all_players[,1]),length(all_players[,1])/2)
+all_players$platform<-"PC"
+all_players$platform[s]<-"Console"
 
-all_players$skill[all_players$platform=="PC"]<-all_players$skill[all_players$platform=="PC"]+1
+
+all_players$skill[all_players$platform=="PC"]<-all_players$skill[all_players$platform=="PC"]+0.5
 
 #run through all players a few times so there are statistics
 
 #everyone plays 100 matches to initialise the numbers
-for(l in 1:10){
+for(l in 1:100){
   print(l)
 for(k in 1:1000){
   #if(k%%100==0){print(k)}

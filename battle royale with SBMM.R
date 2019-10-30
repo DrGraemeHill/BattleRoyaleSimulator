@@ -6,15 +6,15 @@ library(ggplot2)
 source("battle royale functions.R")
 
 
-load("all_players.RData")
-all_players<-all_players%>%select(-round_aggression,-round_skill)%>%
-  mutate(platform="PC")
+load("all_players_platform.RData")
+#all_players<-all_players%>%select(-round_aggression,-round_skill)%>%
+#  mutate(platform="PC")
 
 
 #can't calc the quantiles initially as there are too many players with no wins
 #will just order the players by matches_won
 #this won't rank the equal placed but this will change eventually
-
+all_players$ranking<-0
 o<-order(all_players$matches_won,decreasing = T)
 all_players$ranking[o[1:25000]]<-4
 all_players$ranking[o[25001:50000]]<-3
@@ -81,12 +81,18 @@ all_players[all_players$ranking==rank,]<-player_subset
 
 r<-all_players%>%group_by(ranking)%>%
   summarise(win_percentage=100*mean(matches_won/matches_played))
-result<-rbind(result,c(signif( mean(all_players$matches_played),3),r$win_percentage))
+#result<-rbind(result,c(signif( mean(all_players$matches_played),3),r$win_percentage))
 players_with_no_wins<-length(which(all_players$matches_won==0))
-print(paste(c(signif( mean(all_players$matches_played),3),
-              players_with_no_wins,
-              signif(r$win_percentage,3))))
-  #rerank
+#print(paste(c(signif( mean(all_players$matches_played),3),
+#              players_with_no_wins,
+#              signif(r$win_percentage,3))))
+r<-all_players%>%group_by(platform)%>%
+  summarise(wins=100*mean(matches_won/matches_played),
+            kd=mean(kills/matches_played))%>%
+  mutate(iterations=k)
+print(r)
+result<-rbind(result,r)
+ #rerank
   o<-order(all_players$matches_won/all_players$matches_played,decreasing = T)
 all_players$ranking[o[1:25000]]<-4
 all_players$ranking[o[25001:50000]]<-3
